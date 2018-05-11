@@ -1,6 +1,7 @@
 rm(list=ls())
 par(mfrow=c(1,1), mar=c(5.1, 4.1, 4.1, 2.1))
 source("src/functionGenerator.R")
+source("src/functionAddNoise.R")
 #install.packages("methods")
 #install.packages("DiceKriging")
 #install.packages("DiceOptim")
@@ -31,13 +32,15 @@ cexsize=1.5
 # DEFINE SCENARIO AND EGO PARAMETERS
 # ***************************************************************
 # Geology: 1 or 2
-selectedGeology <- 1
+geolid <- 1
 # Source c(89,-36) or c(100,10)
-sourceCoord <- c(89,-36)
+sourcexy <- c(89,-36)
 # Norm: 1 for L1 norm, 2 for L2 norm
-pNorm <- 1
+lpnorm <- 1
 # Wells ID: combination of wells identified individually between 1 and 25
-selectedWells <- c(3,2,4,1,5,8,7,9,6,10,13,12,14,11,15,18,17,19,16,20,23,22,24,21,25)
+wellid <- c(3,2,4,1,5,8,7,9,6,10,13,12,14,11,15,18,17,19,16,20,23,22,24,21,25)
+# proportional error relatively to the real concentrations
+pctnoise <- 30/100 # usually around 10%
 # number of EGO iterations
 nseq <- 5
 # numberof points in the initial design
@@ -48,11 +51,14 @@ lhsseed <- 1
 # ***************************************************************
 # BUILD OBJECTIVE FUNCTION 
 # ***************************************************************
-full_grid_par <- read.table("data/full_grid_searching_zone_par.txt",header=F)
-response.grid <- functionGenerator(selectedWells,selectedGeology,sourceCoord,pNorm)
+full_grid_par <- read.table("data/full_grid_searching_zone_par.txt",header=F) # contains 2601 grid nodes coordinates followed by 2 sources coordinates
+ixsrc <- which(full_grid_par[,1]==sourcexy[1] & full_grid_par[,2]==sourcexy[2]) # find position of source coordinates
+srcid <- ixsrc[length(ixsrc)] # keep only 1
+full_grid_par <- full_grid_par[1:2601,] # restrain to grid nodes
+response.grid <- functionGenerator (wellid,geolid,srcid,lpnorm,pctnoise)
 
 argmin <- full_grid_par[which.min(response.grid),]
-myTitle <- paste("Geology #",selectedGeology,", L",pNorm," norm, (x_s,y_s)=(",sourceCoord[1],",",sourceCoord[2],")",sep="")
+myTitle <- paste("Geology #",geolid,", L",lpnorm," norm, (x_s,y_s)=(",sourcexy[1],",",sourcexy[2],")",sep="")
 xgrid <- seq(20,170,by=3)
 ygrid <- seq(-75,75,by=3)
 ngridx <- length(xgrid)
