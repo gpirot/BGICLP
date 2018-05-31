@@ -27,7 +27,7 @@ lpnorm <- 2
 #wellid <- c(11,12,13,14,15,1,2,3,4,5,21,22,23,24,25,6,7,8,9,10)
 wellid <- c(11,12,13,14,15,1,2,3,4,5,21,22,23,24,25,6,7,8,9,10,16,17,18,19,20)
 # proportional error relatively to the real concentrations
-pctnoise <- 30/100 # usually around 10%
+pctnoise <- 0/100 # usually around 10%
 
 
 # ***************************************************************
@@ -58,12 +58,12 @@ breaks <- seq(min(matrix(response.grid, ngridx, ngridy)), max(matrix(response.gr
 #col=grey.colors(100), ,main=myTitle
 plot.new()
 image(xgrid, ygrid, matrix(response.grid, ngridx, ngridy),col=pal.1(length(breaks)-1), breaks=breaks,
-      xlab="X",ylab="Y", xaxt='n', yaxt='n', ann=FALSE)
-#contour(xgrid, ygrid, matrix(response.grid, ngridx, ngridy), nlevels=50 ,add=TRUE)
+      xlab="X(m)",ylab="Y(m)",cex.lab=1.0,cex.axis=1.0) #, xaxt='n', yaxt='n', ann=FALSE
+contour(xgrid, ygrid, matrix(response.grid, ngridx, ngridy), nlevels=50 ,add=TRUE)
 points(argmin,col="magenta",pch=12,cex=1.0)
 points(sourcexy[1],sourcexy[2],col="green",pch="o",cex=1.5)
 
 nbwells<-length(wellid)
-dev.copy(png,paste("figures/geol",geolid,"nbwells",nbwells,"noise",noise,'.png',sep=""))
+dev.copy(png,paste("figures/geol",geolid,"nbwells",nbwells,"noise",pctnoise*100,'.png',sep=""))
 dev.off()
-
+graphics.off()
